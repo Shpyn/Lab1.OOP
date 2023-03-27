@@ -1,113 +1,81 @@
 ﻿#include <iostream>
 #include <string>
-#include <map>
 
-// Абстрактный класс, определяющий интерфейс для стратегий
 class WeaponStrategy {
 public:
     virtual std::string useWeapon() = 0;
+    virtual ~WeaponStrategy() {}
 };
 
-// Конкретная стратегия для меча
 class SwordStrategy : public WeaponStrategy {
 public:
     std::string useWeapon() override {
-        return "Удар мечом";
+        return "Sword";
     }
 };
 
-// Конкретная стратегия для лука со стрелами
 class BowStrategy : public WeaponStrategy {
 public:
     std::string useWeapon() override {
-        return "Выстрел из лука";
+        return "Bow with arrows";
     }
 };
 
-// Конкретная стратегия для арбалета
 class CrossbowStrategy : public WeaponStrategy {
 public:
     std::string useWeapon() override {
-        return "Выстрел из арбалета";
+        return "Crossbow";
     }
 };
 
-// Абстрактный класс, определяющий интерфейс для персонажей
 class Character {
-protected:
-    std::string color;
-    WeaponStrategy* weaponStrategy; // Ссылка на стратегию оружия
+private:
+    std::string type_;
+    std::string color_;
+    WeaponStrategy* weaponStrategy_;
 public:
-    virtual void setColor(std::string color) {
-        this->color = color;
-    }
+    Character(const std::string& type, const std::string& color)
+        : type_(type), color_(color), weaponStrategy_(nullptr) {}
+
     void setWeaponStrategy(WeaponStrategy* weaponStrategy) {
-        this->weaponStrategy = weaponStrategy;
+        weaponStrategy_ = weaponStrategy;
     }
-    virtual void attack() = 0;
-};
 
-// Конкретный персонаж - король
-class King : public Character {
-public:
-    void attack() override {
-        std::cout << color << " король: " << weaponStrategy->useWeapon() << std::endl;
+    std::string useWeapon() {
+        if (weaponStrategy_ == nullptr) {
+            return "No weapon";
+        }
+        else {
+            return weaponStrategy_->useWeapon();
+        }
     }
-};
 
-// Конкретный персонаж - королева
-class Queen : public Character {
-public:
-    void attack() override {
-        std::cout << color << " королева: " << weaponStrategy->useWeapon() << std::endl;
+    std::string getType() const {
+        return type_;
     }
-};
 
-// Конкретный персонаж - рыцарь
-class Knight : public Character {
-public:
-    void attack() override {
-        std::cout << color << " рыцарь: " << weaponStrategy->useWeapon() << std::endl;
-    }
-};
-
-// Конкретный персонаж - тролль
-class Troll : public Character {
-public:
-    void attack() override {
-        std::cout << color << " тролль: " << weaponStrategy->useWeapon() << std::endl;
+    std::string getColor() const {
+        return color_;
     }
 };
 
 int main() {
-    setlocale(LC_ALL, "Russian"); //Для адекватного отображения языка
-    // Создаем объекты конкретных стратегий
-    SwordStrategy swordStrategy;
-    BowStrategy bowStrategy;
-    CrossbowStrategy crossbowStrategy;
+    Character king("King", "blue");
+    king.setWeaponStrategy(new SwordStrategy());
 
-    // Создаем объекты конкретных персонажей
-    King king;
-    Queen queen;
-    Knight knight;
-    Troll troll;
+    Character queen("Queen", "red");
+    queen.setWeaponStrategy(new BowStrategy());
 
-    // Устанавливаем стратегии оружия для каждого персонажа
-    king.setWeaponStrategy(&swordStrategy);
-    queen.setWeaponStrategy(&bowStrategy);
-    knight.setWeaponStrategy(&crossbowStrategy);
-    troll.setWeaponStrategy(&swordStrategy);
+    Character knight("Knight", "yellow");
+    knight.setWeaponStrategy(new CrossbowStrategy());
 
-    // Устанавливаем цвета для каждого персонажа
-    king.setColor("Красный");
-    queen.setColor("Зеленый");
-    troll.setColor("Зеленый");
+    Character troll("Troll", "green");
+    troll.setWeaponStrategy(new SwordStrategy());
 
-    // Атакуем выбранными персонажами
-    king.attack();
-    queen.attack();
-    knight.attack();
-    troll.attack();
+    std::cout << king.getType() << " (" << king.getColor() << ") uses " << king.useWeapon() << std::endl;
+    std::cout << queen.getType() << " (" << queen.getColor() << ") uses " << queen.useWeapon() << std::endl;
+    std::cout << knight.getType() << " (" << knight.getColor() << ") uses " << knight.useWeapon() << std::endl;
+    std::cout << troll.getType() << " (" << troll.getColor() << ") uses " << troll.useWeapon() << std::endl;
 
     return 0;
 }
